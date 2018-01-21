@@ -12,8 +12,8 @@
 
     <Button
         android:id="@+id/image1"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon1"
         android:onClick="image1"
         android:layout_marginLeft="0dp"
@@ -25,8 +25,8 @@
 
     <Button
         android:id="@+id/image2"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon2"
         android:onClick="image2"
         android:layout_marginLeft="0dp"
@@ -38,8 +38,8 @@
 
     <Button
         android:id="@+id/image3"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon3"
         android:onClick="image3"
         android:layout_marginLeft="0dp"
@@ -51,8 +51,8 @@
 
     <Button
         android:id="@+id/image8"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon8"
         android:onClick="image8"
         android:layout_marginLeft="0dp"
@@ -68,8 +68,8 @@
 
     <Button
         android:id="@+id/image4"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon4"
         android:onClick="image4"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -85,8 +85,8 @@
 
     <Button
         android:id="@+id/image6"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon6"
         android:onClick="image6"
         android:layout_marginLeft="0dp"
@@ -98,8 +98,8 @@
 
     <Button
         android:id="@+id/image7"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon7"
         android:onClick="image7"
         android:layout_marginLeft="0dp"
@@ -111,16 +111,14 @@
 
     <Button
         android:id="@+id/image5"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:background="@drawable/icon5"
         android:onClick="image5"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="0dp"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@+id/image6"
         app:layout_constraintHorizontal_bias="0.056"
-        app:layout_constraintBaseline_toBaselineOf="@+id/image6" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <TextView
         android:id="@+id/textView"
