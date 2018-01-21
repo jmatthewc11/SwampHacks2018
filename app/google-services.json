@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "81763049543",
+    "firebase_url": "https://swamp-spectrum.firebaseio.com",
+    "project_id": "swamp-spectrum",
+    "storage_bucket": "swamp-spectrum.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:81763049543:android:e26f5535deebc8b1",
+        "android_client_info": {
+          "package_name": "android.swamp.spectrum"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "81763049543-4en9ebg07km00dnibi3m8ao4tc6e1s0m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz_rHeDC_ghXa69X0rK8XHPGczqAzeqlg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:81763049543:android:75518492a3436dc4",
+        "android_client_info": {
+          "package_name": "swamp.spectrum.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "81763049543-d1hp36j9vonu95jg8v35rtqsbpci21st.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "swamp.spectrum.app",
+            "certificate_hash": "f2b2e04051674f7a3447c7523dd6a10621722ffd"
+          }
+        },
+        {
+          "client_id": "81763049543-4en9ebg07km00dnibi3m8ao4tc6e1s0m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz_rHeDC_ghXa69X0rK8XHPGczqAzeqlg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "81763049543-4en9ebg07km00dnibi3m8ao4tc6e1s0m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

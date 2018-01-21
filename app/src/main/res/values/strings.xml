@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Autism Detector</string>
+    <string name="edit_message">Enter a message</string>
+    <string name="button_continue">Continue</string>
+</resources>
