@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.caitlin.autismdetector.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -212,6 +214,75 @@ public class DrawAnimal extends AppCompatActivity {
     }
 
     public void startClassificaiton(View view) {
+
+        double avgXVel = 0;
+        for(int i = 0; i < velx.size(); i += 300) {
+            avgXVel += velx.get(i);
+        }
+        avgXVel /= velx.size() + 1;
+
+        double avgYVel = 0;
+        for(int i = 0; i < vely.size(); i += 300) {
+            avgYVel += vely.get(i);
+        }
+        avgYVel /= vely.size() + 1;
+
+        double maxXVel = 0;
+        for(int i = 0; i < maxvelx.size(); i+= 300) {
+            if(maxXVel < maxvelx.get(i)) {
+                maxXVel = maxvelx.get(i);
+            }
+        }
+
+        double maxYVel = 0;
+        for(int i = 0; i < maxvely.size(); i+= 300) {
+            if(maxYVel < maxvely.get(i)) {
+                maxYVel = maxvely.get(i);
+            }
+        }
+
+        double avgXAcc = 0.00001;
+        for(int i = 0; i < accx.size(); i+=300) {
+            avgXAcc += (accx.get(i));
+        }
+        avgXAcc /= accx.size() + 1;
+
+        double avgYAcc = 0.00001;
+        for(int i = 0; i < accy.size(); i+=300) {
+            avgYAcc += (accy.get(i) + 1);
+        }
+
+        double avgZAcc = 0.00001;
+        for(int i = 0; i < accz.size(); i+=300) {
+            avgZAcc += accz.get(i);
+        }
+        avgZAcc /= (accz.size() + 1);
+
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+
+        database.child("users").child("avg x-velocity").setValue(avgXVel);
+        database.child("users").child("avg y-velocity").setValue(avgYVel);
+        database.child("users").child("max x-velocity").setValue(maxXVel);
+        database.child("users").child("max y-velocity").setValue(maxYVel);
+
+        try {
+            database.child("users").child("avg x-acceleration").setValue(avgXAcc);
+        } catch(Exception e) {
+            database.child("users").child("avg x-acceleration").setValue(0);
+        }
+
+        try {
+            database.child("users").child("avg y-acceleration").setValue(avgYAcc);
+        } catch (Exception e) {
+            database.child("users").child("avg y-acceleration").setValue(0);
+        }
+
+        try {
+            database.child("users").child("avg z-acceleration").setValue(avgZAcc);
+        } catch (Exception e) {
+            database.child("users").child("avg z-acceleration").setValue(0);
+        }
+
         Intent intent = new Intent(this, Classification.class);
         startActivity(intent);
     }
