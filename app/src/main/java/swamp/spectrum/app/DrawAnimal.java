@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawAnimal extends AppCompatActivity {
+public class DrawAnimal extends AppCompatActivity implements SensorEventListener {
 
     public int animalChoice = 0;
 
@@ -46,8 +47,15 @@ public class DrawAnimal extends AppCompatActivity {
     float maxXVelocity;
     float maxYVelocity;
 
+    float maxXAcc = 0;
+    float maxYAcc = 0;
+    float maxZAcc = 0;
+
     SensorManager mSensorManager;
+    SensorManager sensorManager;
+    SensorEventListener _SensorEventListener;
     Sensor mSensor;
+    Sensor accelerometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,33 +85,27 @@ public class DrawAnimal extends AppCompatActivity {
             maxvely.add(maxvelyarr[i]);
         }
 
-        float[] accxarr = intent.getFloatArrayExtra("accxarr");
-        for(int i = 0; i < accxarr.length; i++) {
-            accx.add(accxarr[i]);
-        }
-
-        float[] accyarr = intent.getFloatArrayExtra("accyarr");
-        for(int i = 0; i < accyarr.length; i++) {
-            accy.add(accyarr[i]);
-        }
-
-        float[] acczarr = intent.getFloatArrayExtra("acczarr");
-        for(int i = 0; i < acczarr.length; i++) {
-            accz.add(acczarr[i]);
-        }
-
         textAvtion = (TextView) findViewById(R.id.action2);
         textVelocityX = (TextView) findViewById(R.id.velocityx2);
         textVelocityY = (TextView) findViewById(R.id.velocityy2);
         textMaxVelocityX = (TextView) findViewById(R.id.maxvelocityx2);
         textMaxVelocityY = (TextView) findViewById(R.id.maxvelocityy2);
-        textAccelerationZ = (TextView) findViewById(R.id.accelerationz2);
         textAccelerationX = (TextView) findViewById(R.id.accelerationx2);
         textAccelerationY = (TextView) findViewById(R.id.accelerationy2);
+        textAccelerationZ = (TextView) findViewById(R.id.accelerationz2);
+
+        textVelocityX.setText("X-velocity (pixel/s): 0");
+        textVelocityY.setText("Y-velocity (pixel/s): 0");
+        textMaxVelocityX.setText("max. X-velocity: 0");
+        textMaxVelocityY.setText("max. Y-velocity: 0");
+        textAccelerationX.setText("X-acceleration (pixel/s^2): 0");
+        textAccelerationY.setText("Y-acceleration (pixel/s^2): 0");
+        textAccelerationZ.setText("Z-acceleration (pixel/s^2): 0");
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+        listenAccelerometer();
         ImageView view = (ImageView)findViewById(R.id.picture);
 
         switch(animalChoice){
@@ -136,6 +138,41 @@ public class DrawAnimal extends AppCompatActivity {
 
     }
 
+    protected void listenAccelerometer() {
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            // success! we have an accelerometer
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        } else {
+            // fail! we dont have an accelerometer!
+        }
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        if(x < maxXAcc) {
+            maxXAcc = x;
+        }
+        if(y < maxYAcc) {
+            maxYAcc = y;
+        }
+        if(z < maxZAcc) {
+            maxZAcc = z;
+        }
+
+        accx.add(x);
+        accy.add(y);
+        accz.add(z);
+
+        textAccelerationX.setText("X-acceleration (pixel/s^2): " + x);
+        textAccelerationY.setText("Y-acceleration (pixel/s^2): " + y);
+        textAccelerationZ.setText("Z-acceleration (pixel/s^2): " + z);
+    }
+    @Override
+
     public boolean onTouchEvent(MotionEvent event) {
 
         int action = event.getActionMasked();
@@ -150,14 +187,6 @@ public class DrawAnimal extends AppCompatActivity {
                 velocityTracker.addMovement(event);
                 maxXVelocity = 0;
                 maxYVelocity = 0;
-
-                textVelocityX.setText("X-velocity (pixel/s): 0");
-                textVelocityY.setText("Y-velocity (pixel/s): 0");
-                textMaxVelocityX.setText("max. X-velocity: 0");
-                textMaxVelocityY.setText("max. Y-velocity: 0");
-                textAccelerationX.setText("X-acceleration: 0");
-                textAccelerationY.setText("Y-acceleration: 0");
-                textAccelerationZ.setText("Z-acceleration: 0");
 
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -197,22 +226,6 @@ public class DrawAnimal extends AppCompatActivity {
         return true;
     }
 
-    public void onSensorChanged(SensorEvent se)
-    {
-
-        float accX = se.values[SensorManager.DATA_X];
-        accx.add(accX);
-        float accY = se.values[SensorManager.DATA_Y];
-        accy.add(accY);
-        float accZ = se.values[SensorManager.DATA_Z];
-        accz.add(accZ);
-        long now = System.currentTimeMillis();
-
-        textAccelerationX.setText("X-acceleration: " + accX);
-        textAccelerationY.setText("Y-acceleration: " + accY);
-        textAccelerationZ.setText("Z-acceleration: " + accZ);
-    }
-
     public void startClassificaiton(View view) {
 
         double avgXVel = 0;
@@ -226,6 +239,24 @@ public class DrawAnimal extends AppCompatActivity {
             avgYVel += vely.get(i);
         }
         avgYVel /= vely.size() + 1;
+
+        double avgXAcc = 0;
+        for(int i = 0; i < accx.size(); i += 300) {
+            avgXAcc += accx.get(i);
+        }
+        avgXAcc /= accx.size() + 1;
+
+        double avgYAcc = 0;
+        for(int i = 0; i < accy.size(); i += 300) {
+            avgYAcc += accy.get(i);
+        }
+        avgYAcc /= accy.size() + 1;
+
+        double avgZAcc = 0;
+        for(int i = 0; i < accz.size(); i += 300) {
+            avgZAcc += accz.get(i);
+        }
+        avgZAcc /= accz.size() + 1;
 
         double maxXVel = 0;
         for(int i = 0; i < maxvelx.size(); i+= 300) {
@@ -241,49 +272,23 @@ public class DrawAnimal extends AppCompatActivity {
             }
         }
 
-        double avgXAcc = 0.00001;
-        for(int i = 0; i < accx.size(); i+=300) {
-            avgXAcc += (accx.get(i));
-        }
-        avgXAcc /= accx.size() + 1;
-
-        double avgYAcc = 0.00001;
-        for(int i = 0; i < accy.size(); i+=300) {
-            avgYAcc += (accy.get(i) + 1);
-        }
-
-        double avgZAcc = 0.00001;
-        for(int i = 0; i < accz.size(); i+=300) {
-            avgZAcc += accz.get(i);
-        }
-        avgZAcc /= (accz.size() + 1);
-
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
         database.child("users").child("avg x-velocity").setValue(avgXVel);
         database.child("users").child("avg y-velocity").setValue(avgYVel);
         database.child("users").child("max x-velocity").setValue(maxXVel);
         database.child("users").child("max y-velocity").setValue(maxYVel);
-
-        try {
-            database.child("users").child("avg x-acceleration").setValue(avgXAcc);
-        } catch(Exception e) {
-            database.child("users").child("avg x-acceleration").setValue(0);
-        }
-
-        try {
-            database.child("users").child("avg y-acceleration").setValue(avgYAcc);
-        } catch (Exception e) {
-            database.child("users").child("avg y-acceleration").setValue(0);
-        }
-
-        try {
-            database.child("users").child("avg z-acceleration").setValue(avgZAcc);
-        } catch (Exception e) {
-            database.child("users").child("avg z-acceleration").setValue(0);
-        }
+        database.child("users").child("avg x-acc").setValue(avgXAcc);
+        database.child("users").child("avg y-acc").setValue(avgYAcc);
+        database.child("users").child("avg z-acc").setValue(avgZAcc);
+        database.child("users").child("max x-acc").setValue(maxXAcc);
+        database.child("users").child("max y-acc").setValue(maxYAcc);
+        database.child("users").child("max z-acc").setValue(maxZAcc);
 
         Intent intent = new Intent(this, Classification.class);
         startActivity(intent);
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 }

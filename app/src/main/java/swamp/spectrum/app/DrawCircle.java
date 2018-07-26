@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,16 +15,19 @@ import android.widget.TextView;
 import com.example.caitlin.autismdetector.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class DrawCircle extends AppCompatActivity {
+public class DrawCircle extends AppCompatActivity implements SensorEventListener {
 
-    ArrayList<Float> velx = new ArrayList<Float>();
-    ArrayList<Float> vely = new ArrayList<Float>();
-    ArrayList<Float> maxvelx = new ArrayList<Float>();
-    ArrayList<Float> maxvely = new ArrayList<Float>();
-    ArrayList<Float> accx = new ArrayList<Float>();
-    ArrayList<Float> accy = new ArrayList<Float>();
-    ArrayList<Float> accz = new ArrayList<Float>();
+    public int animalChoice = 0;
+
+    List<Float> velx = new ArrayList<Float>();
+    List<Float> vely = new ArrayList<Float>();
+    List<Float> maxvelx = new ArrayList<Float>();
+    List<Float> maxvely = new ArrayList<Float>();
+    List<Float> accx = new ArrayList<Float>();
+    List<Float> accy = new ArrayList<Float>();
+    List<Float> accz = new ArrayList<Float>();
 
     TextView textAvtion;
     TextView textVelocityX;
@@ -39,10 +43,16 @@ public class DrawCircle extends AppCompatActivity {
     float maxXVelocity;
     float maxYVelocity;
 
-    SensorManager mSensorManager;
-    Sensor mSensor;
+    float maxXAcc = 0;
+    float maxYAcc = 0;
+    float maxZAcc = 0;
 
-    public int animalChoice = 0;
+    SensorManager mSensorManager;
+    SensorManager sensorManager;
+    SensorEventListener _SensorEventListener;
+    Sensor mSensor;
+    Sensor accelerometer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,14 +66,58 @@ public class DrawCircle extends AppCompatActivity {
         textVelocityY = (TextView) findViewById(R.id.velocityy);
         textMaxVelocityX = (TextView) findViewById(R.id.maxvelocityx);
         textMaxVelocityY = (TextView) findViewById(R.id.maxvelocityy);
-        textAccelerationZ = (TextView) findViewById(R.id.accelerationz);
         textAccelerationX = (TextView) findViewById(R.id.accelerationx);
         textAccelerationY = (TextView) findViewById(R.id.accelerationy);
+        textAccelerationZ = (TextView) findViewById(R.id.accelerationz);
+
+        textVelocityX.setText("X-velocity (pixel/s): 0");
+        textVelocityY.setText("Y-velocity (pixel/s): 0");
+        textMaxVelocityX.setText("max. X-velocity: 0");
+        textMaxVelocityY.setText("max. Y-velocity: 0");
+        textAccelerationX.setText("X-acceleration (pixel/s^2): 0");
+        textAccelerationY.setText("Y-acceleration (pixel/s^2): 0");
+        textAccelerationZ.setText("Z-acceleration (pixel/s^2): 0");
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+        listenAccelerometer();
     }
+
+    protected void listenAccelerometer() {
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            // success! we have an accelerometer
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        } else {
+            // fail! we dont have an accelerometer!
+        }
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        if(x < maxXAcc) {
+            maxXAcc = x;
+        }
+        if(y < maxYAcc) {
+            maxYAcc = y;
+        }
+        if(z < maxZAcc) {
+            maxZAcc = z;
+        }
+
+        accx.add(x);
+        accy.add(y);
+        accz.add(z);
+
+        textAccelerationX.setText("X-acceleration (pixel/s^2): " + x);
+        textAccelerationY.setText("Y-acceleration (pixel/s^2): " + y);
+        textAccelerationZ.setText("Z-acceleration (pixel/s^2): " + z);
+    }
+    @Override
 
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -79,14 +133,6 @@ public class DrawCircle extends AppCompatActivity {
                 velocityTracker.addMovement(event);
                 maxXVelocity = 0;
                 maxYVelocity = 0;
-
-                textVelocityX.setText("X-velocity (pixel/s): 0");
-                textVelocityY.setText("Y-velocity (pixel/s): 0");
-                textMaxVelocityX.setText("max. X-velocity: 0");
-                textMaxVelocityY.setText("max. Y-velocity: 0");
-                textAccelerationX.setText("X-acceleration: 0");
-                textAccelerationY.setText("Y-acceleration: 0");
-                textAccelerationZ.setText("Z-acceleration: 0");
 
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -119,6 +165,7 @@ public class DrawCircle extends AppCompatActivity {
                 break;
             case MotionEvent.ACTION_UP:
                 drawAnimal(animalChoice);
+                break;
             case MotionEvent.ACTION_CANCEL:
                 velocityTracker.recycle();
                 break;
@@ -174,22 +221,7 @@ public class DrawCircle extends AppCompatActivity {
 
         startActivity(intent);
     }
-
-    public void onSensorChanged(SensorEvent se)
-    {
-
-        float accX = se.values[SensorManager.DATA_X];
-        accx.add(accX);
-        float accY = se.values[SensorManager.DATA_Y];
-        accy.add(accY);
-        float accZ = se.values[SensorManager.DATA_Z];
-        accz.add(accZ);
-        long now = System.currentTimeMillis();
-
-        textAccelerationX.setText("X-acceleration: " + accX);
-        textAccelerationY.setText("Y-acceleration: " + accY);
-        textAccelerationZ.setText("Z-acceleration: " + accZ);
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 }
-
-
